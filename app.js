@@ -51,13 +51,52 @@ intern_question = [
     }
 ]
 
+team_question = [
+    {
+        type: "input",
+        name: "team",
+        message: "what is your team name?"
+    }
+]
+add_to_team_question = [
+    {
+        type: "input",
+        name: "add",
+        message: "how many are on the team?"
+    }
+]
+
+function start() {
+    inquirer.prompt(team_question).then(val => {
+        const fs = fileSystem;
+
+        const templateFile = fs
+            .readFileSync('./templates/main.html', { encoding: 'utf8' });
+        let temporaryFile = templateFile.replace('{{team}}', val);
+        fs.writeFileSync("./output/final.html", templateFile, 'utf8');
+
+        inputMembers();
+    })
+
+
+}
+
+function inputMembers() {
+    var teamSize; 
+    do {
+    inquirer.prompt(add_to_team_question).then(choice => {
+        teamSize = choice.add; 
+            for (let it = 0; it < choice ;it++) {
+                employeeChoice();              
+            }                
+    });
+    teamSize--; 
+} while(teamSize >0)
+}
+
 function employeeChoice() {
     inquirer.prompt(questions_for_all_employees)
         .then(val => {
-            const fs = fileSystem;
-            const templateFile = fs
-                .readFileSync('./templates/main.html', { encoding: 'utf8' });
-            fs.writeFileSync("./output/final.html", templateFile, 'utf8');
             switch (val.choice) {
                 case "manager":
                     manager(val);
@@ -74,6 +113,9 @@ function employeeChoice() {
         });
 }
 
+
+
+
 function intern(val) {
     inquirer.prompt(intern_question).then(extra => {
         var varIntern = new Intern(val.name, val.idNum, val.email, extra.school);
@@ -83,7 +125,8 @@ function intern(val) {
         let temporaryFile = templateFile.replace('{{name}}', varIntern.name);
         temporaryFile = temporaryFile.replace('{{role}}', varIntern.getRole());
         temporaryFile = temporaryFile.replace('{{id}}', varIntern.id);
-        temporaryFile = temporaryFile.replace('{{email}}', varIntern.email);
+        temporaryFile = temporaryFile.replace('{{email1}}', varIntern.email);
+        temporaryFile = temporaryFile.replace('{{email2}}', varIntern.email);
         temporaryFile = temporaryFile.replace('{{school}}', varIntern.getSchool());
         fs.appendFile("./output/final.html", temporaryFile, err => {
             console.log(err)
@@ -100,10 +143,16 @@ function engineer(val) {
         const templateFile = fs
             .readFileSync('./templates/engineer.html', { encoding: 'utf8' });
         let temporaryFile = templateFile.replace('{{id}}', varEng.id);
+        temporaryFile = temporaryFile.replace('{{name}}', varEng.name);
         temporaryFile = temporaryFile.replace('{{role}}', varEng.getRole());
-        temporaryFile = temporaryFile.replace('{{email}}', varEng.email);
-        temporaryFile = temporaryFile.replace('{{github}}', varEng.email);
-        fs.appendFile("./output/final.html", temporaryFile, 'utf8');
+        temporaryFile = temporaryFile.replace('{{email1}}', varEng.email);
+        temporaryFile = temporaryFile.replace('{{email2}}', varEng.email);
+        temporaryFile = temporaryFile.replace('{{github1}}', varEng.getGithub());
+        temporaryFile = temporaryFile.replace('{{github2}}', varEng.getGithub());
+
+        fs.appendFile("./output/final.html", temporaryFile, err => {
+            console.log(err)
+        });
         console.log("temp file", temporaryFile);
     });
 }
@@ -119,9 +168,11 @@ function manager(val) {
         temporaryFile = temporaryFile.replace('{{email1}}', varMan.email);
         temporaryFile = temporaryFile.replace('{{email2}}', varMan.email);
         temporaryFile = temporaryFile.replace('{{officeNumber}}', varMan.getOffice());
-        fs.appendFile("./output/final.html", temporaryFile, 'utf8');
+        fs.appendFile("./output/final.html", temporaryFile, err => {
+            console.log(err)
+        });
         console.log("temp file", temporaryFile);
     });
 }
 
-employeeChoice();
+start(); 
