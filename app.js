@@ -62,18 +62,19 @@ add_to_team_question = [
     {
         type: "input",
         name: "add",
-        message: "how many are on the team?"
+        message: "would you like to add to the team? yes/no "
     }
 ]
 
 function start() {
     inquirer.prompt(team_question).then(val => {
         const fs = fileSystem;
-
+        console.log(val);
+        console.log(val.team); 
         const templateFile = fs
             .readFileSync('./templates/main.html', { encoding: 'utf8' });
-        let temporaryFile = templateFile.replace('{{team}}', val);
-        fs.writeFileSync("./output/final.html", templateFile, 'utf8');
+        let temporaryFile = templateFile.replace('{{team}}', val.team);
+        fs.writeFileSync("./output/final.html", temporaryFile, 'utf8');
 
         inputMembers();
     })
@@ -82,16 +83,15 @@ function start() {
 }
 
 function inputMembers() {
-    var teamSize; 
-    do {
+    var teamSize;
+
     inquirer.prompt(add_to_team_question).then(choice => {
-        teamSize = choice.add; 
-            for (let it = 0; it < choice ;it++) {
-                employeeChoice();              
-            }                
+        if (choice.add == 'yes')
+            employeeChoice();
+        else
+            console.log("congrats on your team.  see output/final.html ")
     });
-    teamSize--; 
-} while(teamSize >0)
+
 }
 
 function employeeChoice() {
@@ -113,9 +113,6 @@ function employeeChoice() {
         });
 }
 
-
-
-
 function intern(val) {
     inquirer.prompt(intern_question).then(extra => {
         var varIntern = new Intern(val.name, val.idNum, val.email, extra.school);
@@ -131,7 +128,9 @@ function intern(val) {
         fs.appendFile("./output/final.html", temporaryFile, err => {
             console.log(err)
         });
-        console.log("temp file", temporaryFile);
+        //console.log("temp file", temporaryFile);
+
+        inputMembers();
     });
 }
 
@@ -153,7 +152,8 @@ function engineer(val) {
         fs.appendFile("./output/final.html", temporaryFile, err => {
             console.log(err)
         });
-        console.log("temp file", temporaryFile);
+        //console.log("temp file", temporaryFile);
+        inputMembers();
     });
 }
 
@@ -171,7 +171,8 @@ function manager(val) {
         fs.appendFile("./output/final.html", temporaryFile, err => {
             console.log(err)
         });
-        console.log("temp file", temporaryFile);
+        //console.log("temp file", temporaryFile);
+        inputMembers();
     });
 }
 
